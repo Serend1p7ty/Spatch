@@ -13,13 +13,15 @@ else:
     p = remote(ip,port)
 
 
-sla = lambda delim,data         :   p.sendlineafter(delim,data)
+
+sd  = lambda data               :   p.send(data)
 sl  = lambda data               :   p.sendline(data)
 sa  = lambda delim,data         :   p.sendafter(delim,data)
+sla = lambda delim,data         :   p.sendlineafter(delim,data)
 ita = lambda                    :   p.interactive()
 ra  = lambda                    :   p.recvall()
-ru  = lambda delim,drop=True    :   p.recvuntil(delim,drop)
 rv  = lambda numb               :   p.recv(numb)
+ru  = lambda delim,drop=True    :   p.recvuntil(delim,drop)
 lg  = lambda msg                :   log.success(msg)
 def dbg(addr=0):
     if addr != 0:
