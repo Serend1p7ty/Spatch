@@ -1,6 +1,6 @@
 # Spatch ez patchelf
 
-Help pwner ez patchelf
+Help pwner ez patchelf with Glibc-all-in-one
 
 ## Install
 
