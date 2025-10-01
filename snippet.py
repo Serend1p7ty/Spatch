@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 from pwn import *
 context(log_level='debug',arch='amd64')
+context.terminal = ['tmux', 'splitw', '-h']
 file = ''
 elf = ELF(file)
 libc = ELF('')
