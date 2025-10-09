@@ -10,6 +10,27 @@ class C:
     TPL   = HERE / 'snippet.py'
     LD_TXT_RE = re.compile(r'ld-linux-.+\.so\.2')
     log = None                               # 下方初始化
+    # ======== 新增：符号收集 ========
+    @staticmethod
+    def collect_debug_symbols():
+        """把所有版本目录下的 .build-id/**/* 提到 .debug/ 根，并清理空目录"""
+        for ver_dir in (d for d in C.LIBS.iterdir() if d.is_dir()):
+            build_root = ver_dir / '.debug' / '.build-id'
+            if not build_root.exists():
+                continue
+            # 找到所有 debug 文件
+            for debug_file in build_root.rglob('*.debug'):
+                # 目标路径：.debug/<filename>
+                target = ver_dir / '.debug' / debug_file.name
+                if not target.exists():          # 避免重复移动
+                    shutil.move(str(debug_file), str(target))
+            # 清理空目录
+            for p in sorted(build_root.rglob(''), key=lambda x: len(str(x)), reverse=True):
+                if p.is_dir() and not any(p.iterdir()):
+                    p.rmdir()
+            # 如果 .build-id 已空，也删掉
+            if build_root.exists() and not any(build_root.iterdir()):
+                build_root.rmdir()
 
 # -------------- 彩色日志 --------------
 class Log:
@@ -88,6 +109,17 @@ def main():
     if len(args) >= 2: 
         libc_path = Path(args[1])
         if not libc_path.is_file(): fatal(f'libc 文件不存在: {libc_path}')
+
+    # ======== 新增：每次运行都自动整理符号 ========
+    C.collect_debug_symbols()
+
+    if not libc_path:
+        opts = list_dirs()
+        if elf_path:
+            patch_elf(elf_path, ask_choice(opts))
+        else:
+            print_two_cols(opts)
+        return
 
     if not libc_path:                       # 仅列目录 或 单 ELF 让用户选
         opts = list_dirs()
