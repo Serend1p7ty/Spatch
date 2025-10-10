@@ -4,7 +4,7 @@ context(log_level='debug',arch='amd64')
 context.terminal = ['tmux', 'splitw', '-h']
 file = ''
 elf = ELF(file)
-libc = ELF('')
+libc = elf.libc
 rop = ROP(file)
 ip,port = '',''
 local = 1
