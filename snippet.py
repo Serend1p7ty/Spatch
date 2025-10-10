@@ -13,17 +13,17 @@ if local:
 else:
     p = remote(ip,port)
 
+sd   = lambda data               :   p.send(data)
+sl   = lambda data               :   p.sendline(data)
+sa   = lambda delim,data         :   p.sendafter(delim,data)
+sla  = lambda delim,data         :   p.sendlineafter(delim,data)
+ita  = lambda                    :   p.interactive()
+ra   = lambda                    :   p.recvall()
+rv   = lambda numb               :   p.recv(numb)
+ru   = lambda delim,drop=True    :   p.recvuntil(delim,drop)
+lg   = lambda msg                :   log.success(msg)
+leak = lambda                    :   u64(rv(6).ljust(8,b'\x00'))
 
-
-sd  = lambda data               :   p.send(data)
-sl  = lambda data               :   p.sendline(data)
-sa  = lambda delim,data         :   p.sendafter(delim,data)
-sla = lambda delim,data         :   p.sendlineafter(delim,data)
-ita = lambda                    :   p.interactive()
-ra  = lambda                    :   p.recvall()
-rv  = lambda numb               :   p.recv(numb)
-ru  = lambda delim,drop=True    :   p.recvuntil(delim,drop)
-lg  = lambda msg                :   log.success(msg)
 def dbg(addr=0):
     if addr != 0:
         script = f'b *$rebase({str(addr)})'
@@ -32,7 +32,5 @@ def dbg(addr=0):
         attach(p)
     pause()
 
-
-
-leaked = ''
-libc_base = 0
+bias = 0
+libc.base = leak() - bias
